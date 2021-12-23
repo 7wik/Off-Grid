@@ -1,0 +1,74 @@
+clc,clear;close all;
+% solving off grid compressed sensing with ISTA
+% Date: 2019.4.22  Editor: Yinchuan Li
+%====================================================== Basic Parameters
+
+i = sqrt(-1);
+% N = 128;
+% Ns = 64;
+N=16
+Ns = N/2;
+J = 2;
+L = N; % grid number
+
+sigma_w = 0.0;
+numiters = 10;
+co=15;
+avg_ista_off_norm = zeros(co,1)
+tic
+for it=1:numiters
+
+% Signal Generate
+% [y_t,phi,f,w,x_t] = GenOnGrid(N,Ns,J,L,sigma_w);
+[y_t,phi,f,w,x_f] = GenOffGrid(N,Ns,J,L,sigma_w);
+y_f = fft(y_t);
+% disp(y_f)
+% disp("done!!!!!!!!!!!!!!!!!!!")
+
+% figure;plot(abs(y_t));
+% figure;plot(abs(y_f));
+
+% =========================================================
+% on grid compressed sensing estimation
+% tic
+% [f_est,w_est,CS] = CS_grid(y_f,phi,sigma_w,L);
+% toc
+% figure;stem(f,w,'bo');hold on;stem(f_est,w_est,'rs');
+% =========================================================
+% on grid ISTA estimation
+% tic
+% [f_est,w_est,ISTA] = ISTA_grid(y_f,phi,sigma_w,L);
+% toc
+% figure;stem(f,w,'bo');hold on;stem(f_est,w_est,'rs');
+
+
+
+% tic
+% [f_est,w_est,x_est,ISTA] = ISTA_flexgrid_Z(y_f,phi,sigma_w,L,w,f,x_f,J);
+% toc
+
+
+[f_est,w_est,x_est,norms,ISTA] = ISTA_flexgrid_Z_two(y_f,phi,sigma_w,L,w,f,x_f,J,co);
+avg_ista_off_norm = norms+avg_ista_off_norm;
+disp(it)
+disp('Done')
+end
+toc
+avg_ista_off_norm = avg_ista_off_norm/numiters
+figure;stem(f,w,'bo');hold on;stem(f_est,w_est,'rs');
+figure;plot(abs(x_f),'--or');hold on;plot(abs(x_est));
+% disp(size(x_est))
+annet_norms = [0.89193175,  1.2140325,   0.97708812,  0.70798879, 35.96070152,  0.5093414]
+annet_len = length(annet_norms)
+ista_len = length(avg_ista_off_norm)
+ista_x = 1:1:ista_len
+annet_x = 1:1:annet_len
+figure;plot(ista_x,avg_ista_off_norm,'--bo');hold on;plot(annet_x,annet_norms,'--rs');
+legend('ISTA off grid','AN-NET')
+disp(avg_ista_off_norm)
+% NMSE = norm(x_est-x_f)/norm(x_f)
+
+
+
+% Save data
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
