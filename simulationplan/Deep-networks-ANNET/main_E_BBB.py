@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-@author: yinchuan li
+@author: satwik
 @version: 2020.03.12
 Change to complex-valued network
-Off-grid LISTA net
+Off-grid BBB ANNET net
 Change the loss to y-loss
 where in the network return x, and in the loss we use y-Cx
 """
